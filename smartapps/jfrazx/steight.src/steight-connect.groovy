@@ -1,8 +1,8 @@
 /**
- *  Eight Sleep (Connect)
+ *  STEight (Connect)
  *
  *  Copyright 2017 Alex Lee Yuk Cheung
- *  Copyright 2018 Jason Franz
+ *  Copyright 2019 Jason Franz
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -27,10 +27,11 @@
  *	11.01.2017: 1.0 BETA Release 1 - Initial Release
  */
 definition(
-  name: "Eight Sleep (Connect)",
+  name: "STEight (Connect)",
   namespace: "jfrazx",
   author: "Jason Franz",
   description: "Connect your Eight Sleep device to SmartThings",
+  category: "Health & Fitness",
   iconUrl: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png",
   iconX2Url: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png",
   iconX3Url: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png"
@@ -44,416 +45,433 @@ preferences {
   page(name: "notificationsPAGE")
 }
 
-def apiURL(path = '/') 			 { return "https://client-api.8slp.net/v1${path}" }
+def apiURL(path = '/') { return "https://client-api.8slp.net/v1${path}" }
 
 def firstPage() {
-  if (username == null || username == '' || password == null || password == '') {
-		return dynamicPage(name: "firstPage", title: "", install: true, uninstall: true) {
-			section {
-    			headerSECTION()
-                href("loginPAGE", title: null, description: authenticated() ? "Authenticated as " +username : "Tap to enter Eight Sleep account crednentials", state: authenticated())
-  			}
-    	}
+  if (isNullOrEmptyString(username) || isNullOrEmptyString(password)) {
+    return dynamicPage(name: "firstPage", title: "", install: true, uninstall: true) {
+      section {
+        headerSECTION()
+        href("loginPAGE", title: null, description: authenticated() ? "Authenticated as " +username : "Tap to enter Eight Sleep account crednentials", state: authenticated())
+      }
     }
-    else
-    {
-        return dynamicPage(name: "firstPage", title: "", install: true, uninstall: true) {
-			section {
-            	headerSECTION()
-                href("loginPAGE", title: null, description: authenticated() ? "Authenticated as " +username : "Tap to enter Eight Sleep account crednentials", state: authenticated())
-            }
-            if (stateTokenPresent()) {
-            	section ("Add your partner's credentials (optional):") {
-					href("partnerLoginPAGE", title: null, description: partnerAuthenticated() ? "Authenticated as " + partnerUsername : "Tap to enter Eight Sleep partner account crednentials", state: partnerAuthenticated())
-        		}
-            	section ("Choose your Eight Sleep devices:") {
-					href("selectDevicePAGE", title: null, description: devicesSelected() ? getDevicesSelectedString() : "Tap to select Eight Sleep devices", state: devicesSelected())
-        		}
-                section ("Notifications:") {
-					href("notificationsPAGE", title: null, description: notificationsSelected() ? getNotificationsString() : "Tap to configure notifications", state: notificationsSelected())
-        		}
-                section () {
-                	label name: "name", title: "Assign a Name", required: true, state: (name ? "complete" : null), defaultValue: app.name
-                }
-            } else {
-            	section {
-            		paragraph "There was a problem connecting to Eight Sleep. Check your user credentials and error logs in SmartThings web console.\n\n${state.loginerrors}"
-           		}
-           }
-    	}
+  }
+  else
+  {
+    return dynamicPage(name: "firstPage", title: "", install: true, uninstall: true) {
+      section {
+        headerSECTION()
+        href("loginPAGE", title: null, description: authenticated() ? "Authenticated as " +username : "Tap to enter Eight Sleep account crednentials", state: authenticated())
+      }
+      if (stateTokenPresent()) {
+        section ("Add your partner's credentials (optional):") {
+          href("partnerLoginPAGE", title: null, description: partnerAuthenticated() ? "Authenticated as " + partnerUsername : "Tap to enter Eight Sleep partner account crednentials", state: partnerAuthenticated())
+        }
+        section ("Choose your Eight Sleep devices:") {
+          href("selectDevicePAGE", title: null, description: devicesSelected() ? getDevicesSelectedString() : "Tap to select Eight Sleep devices", state: devicesSelected())
+        }
+        section ("Notifications:") {
+          href("notificationsPAGE", title: null, description: notificationsSelected() ? getNotificationsString() : "Tap to configure notifications", state: notificationsSelected())
+        }
+        section () {
+          label name: "name", title: "Assign a Name", required: true, state: (name ? "complete" : null), defaultValue: app.name
+        }
+      } else {
+        section {
+          paragraph "There was a problem connecting to Eight Sleep. Check your user credentials and error logs in SmartThings web console.\n\n${state.loginerrors}"
+        }
+      }
     }
+  }
+}
+
+def isNullOrEmptyString(value) {
+  return isNull(value) || isEmptyString(value)
+}
+
+def isNull(value) {
+  return value == null
+}
+
+def isEmptyString(value) {
+  return value == ''
 }
 
 def loginPAGE() {
-	if (username == null || username == '' || password == null || password == '') {
-		return dynamicPage(name: "loginPAGE", title: "Login", uninstall: false, install: false) {
-    		section { headerSECTION() }
-        	section { paragraph "Enter your Eight Sleep account credentials below to enable SmartThings and Eight Sleep integration." }
-    		section {
-    			input("username", "text", title: "Username", description: "Your Eight Sleep username (usually an email address)", required: true)
-				input("password", "password", title: "Password", description: "Your Eight Sleep password", required: true, submitOnChange: true)
-  			}
-    	}
+  if (isNullOrEmptyString(username) || isNullOrEmptyString(password)) {
+    return dynamicPage(name: "loginPAGE", title: "Login", uninstall: false, install: false) {
+      section { headerSECTION() }
+      section { paragraph "Enter your Eight Sleep account credentials below to enable SmartThings and Eight Sleep integration." }
+      section {
+        input("username", "text", title: "Username", description: "Your Eight Sleep username (usually an email address)", required: true)
+        input("password", "password", title: "Password", description: "Your Eight Sleep password", required: true, submitOnChange: true)
+  		}
     }
-    else {
-    	getEightSleepAccessToken()
-        dynamicPage(name: "loginPAGE", title: "Login", uninstall: false, install: false) {
-    		section { headerSECTION() }
-        	section { paragraph "Enter your Eight Sleep account credentials below to enable SmartThings and Eight Sleep integration." }
-    		section("Eight Sleep Credentials:") {
-				input("username", "text", title: "Username", description: "Your Eight Sleep username (usually an email address)", required: true)
-				input("password", "password", title: "Password", description: "Your Eight Sleep password", required: true, submitOnChange: true)
-			}
+  }
+  else {
+    getEightSleepAccessToken()
+    dynamicPage(name: "loginPAGE", title: "Login", uninstall: false, install: false) {
+      section { headerSECTION() }
+      section { paragraph "Enter your Eight Sleep account credentials below to enable SmartThings and Eight Sleep integration." }
+      section("Eight Sleep Credentials:") {
+        input("username", "text", title: "Username", description: "Your Eight Sleep username (usually an email address)", required: true)
+        input("password", "password", title: "Password", description: "Your Eight Sleep password", required: true, submitOnChange: true)
+      }
 
-    		if (stateTokenPresent()) {
-        		section {
-                	paragraph "You have successfully connected to Eight Sleep. Click 'Done' to select your Eight Sleep devices."
-  				}
-        	}
-        	else {
-        		section {
-            		paragraph "There was a problem connecting to Eight Sleep. Check your user credentials and error logs in SmartThings web console.\n\n${state.loginerrors}"
-           		}
-        	}
+      if (stateTokenPresent()) {
+        section {
+          paragraph "You have successfully connected to Eight Sleep. Click 'Done' to select your Eight Sleep devices."
         }
+      }
+      else {
+        section {
+          paragraph "There was a problem connecting to Eight Sleep. Check your user credentials and error logs in SmartThings web console.\n\n${state.loginerrors}"
+        }
+      }
     }
+  }
 }
 
 def partnerLoginPAGE() {
-	if (partnerUsername == null || partnerUsername == '' || partnerPassword == null || partnerPassword == '') {
-		return dynamicPage(name: "partnerLoginPAGE", title: "Partner Login", uninstall: false, install: false) {
-    		section { headerSECTION() }
-        	section { paragraph "Enter your Eight Sleep partner account credentials below." }
-    		section {
-    			input("partnerUsername", "text", title: "Username", description: "Your Eight Sleep partner username (usually an email address)", required: false)
-				input("partnerPassword", "password", title: "Password", description: "Your Eight Sleep partner password", required: true, submitOnChange: false)
-  			}
-    	}
+  if (isNullOrEmptyString(partnerUsername) || isNullOrEmptyString(partnerPassword)) {
+    return dynamicPage(name: "partnerLoginPAGE", title: "Partner Login", uninstall: false, install: false) {
+      section { headerSECTION() }
+      section { paragraph "Enter your Eight Sleep partner account credentials below." }
+      section {
+        input("partnerUsername", "text", title: "Username", description: "Your Eight Sleep partner username (usually an email address)", required: false)
+        input("partnerPassword", "password", title: "Password", description: "Your Eight Sleep partner password", required: true, submitOnChange: false)
+      }
     }
-    else {
-    	getEightSleepPartnerAccessToken()
-        dynamicPage(name: "partnerLoginPAGE", title: "Login", uninstall: false, install: false) {
-    		section { headerSECTION() }
-        	section { paragraph "Enter your Eight Sleep partner account credentials below." }
-    		section("Eight Sleep Partner Credentials:") {
-				input("partnerUsername", "text", title: "Username", description: "Your Eight Sleep partner username (usually an email address)", required: false)
-				input("partnerPassword", "password", title: "Password", description: "Your Eight Sleep partner password", required: true, submitOnChange: false)
-			}
+  }
+  else {
+    getEightSleepPartnerAccessToken()
+    dynamicPage(name: "partnerLoginPAGE", title: "Login", uninstall: false, install: false) {
+      section { headerSECTION() }
+      section { paragraph "Enter your Eight Sleep partner account credentials below." }
+      section("Eight Sleep Partner Credentials:") {
+        input("partnerUsername", "text", title: "Username", description: "Your Eight Sleep partner username (usually an email address)", required: false)
+        input("partnerPassword", "password", title: "Password", description: "Your Eight Sleep partner password", required: true, submitOnChange: false)
+      }
 
-    		if (statePartnerTokenPresent()) {
-        		section {
-                	paragraph "You have successfully added your partner's credentials.."
-  				}
-        	}
-        	else {
-        		section {
-            		paragraph "There was a problem adding your partner's Eight Sleep credentials. Check your partner user credentials and error logs in SmartThings web console.\n\n${state.loginerrors}"
-           		}
-        	}
+      if (statePartnerTokenPresent()) {
+        section {
+          paragraph "You have successfully added your partner's credentials.."
         }
+      }
+      else {
+        section {
+          paragraph "There was a problem adding your partner's Eight Sleep credentials. Check your partner user credentials and error logs in SmartThings web console.\n\n${state.loginerrors}"
+        }
+      }
     }
+  }
 }
 
 def selectDevicePAGE() {
-	updateDevices()
-	dynamicPage(name: "selectDevicePAGE", title: "Devices", uninstall: false, install: false) {
-  	section { headerSECTION() }
+  updateDevices()
+  dynamicPage(name: "selectDevicePAGE", title: "Devices", uninstall: false, install: false) {
+    section { headerSECTION() }
     section("Select your devices:") {
-			input "selectedEightSleep", "enum", image: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/eightsleep-device.png", required:false, title:"Select Eight Sleep Device \n(${state.eightSleepDevices.size() ?: 0} found)", multiple:true, options:state.eightSleepDevices
-	}
+      input "selectedEightSleep", "enum", image: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/eightsleep-device.png", required:false, title:"Select Eight Sleep Device \n(${state.eightSleepDevices.size() ?: 0} found)", multiple:true, options:state.eightSleepDevices
+    }
   }
 }
 
 def notificationsPAGE() {
-	dynamicPage(name: "notificationsPAGE", title: "Preferences", uninstall: false, install: false) {
-    	section {
-        	input("recipients", "contact", title: "Send notifications to", required: false, submitOnChange: true) {
-				input "sendPush", "bool", title: "Send notifications via Push?", required: false, defaultValue: false, submitOnChange: true
-            }
-            input "sendSMS", "phone", title: "Send notifications via SMS?", required: false, defaultValue: null, submitOnChange: true
-            if ((location.contactBookEnabled && settings.recipients) || settings.sendPush || settings.sendSMS != null) {
-				input "onNotification", "bool", title: "Notify when Eight Sleep heat is on ", required: false, defaultValue: false
-				input "offNotification", "bool", title: "Notify when Eight Sleep heat is off ", required: false, defaultValue: false
-				input "inBedNotification", "bool", title: "Notify when 'In Bed' event occurs", required: false, defaultValue: false
-            	input "outOfBedNotification", "bool", title: "Notify when 'Out Of Bed' event occurs", required: false, defaultValue: false
-            	input "heatLevelReachedNotification", "bool", title: "Notify when desired heat level reached", required: false, defaultValue: false
-            	input "sleepScoreNotification", "bool", title: "Notify when latest sleep score is updated", required: false, defaultValue: false
-            }
-		}
+  dynamicPage(name: "notificationsPAGE", title: "Preferences", uninstall: false, install: false) {
+    section {
+      input("recipients", "contact", title: "Send notifications to", required: false, submitOnChange: true) {
+        input "sendPush", "bool", title: "Send notifications via Push?", required: false, defaultValue: false, submitOnChange: true
+      }
+      input "sendSMS", "phone", title: "Send notifications via SMS?", required: false, defaultValue: null, submitOnChange: true
+      if ((location.contactBookEnabled && settings.recipients) || settings.sendPush || settings.sendSMS != null) {
+        input "onNotification", "bool", title: "Notify when Eight Sleep heat is on ", required: false, defaultValue: false
+        input "offNotification", "bool", title: "Notify when Eight Sleep heat is off ", required: false, defaultValue: false
+        input "inBedNotification", "bool", title: "Notify when 'In Bed' event occurs", required: false, defaultValue: false
+        input "outOfBedNotification", "bool", title: "Notify when 'Out Of Bed' event occurs", required: false, defaultValue: false
+        input "heatLevelReachedNotification", "bool", title: "Notify when desired heat level reached", required: false, defaultValue: false
+        input "sleepScoreNotification", "bool", title: "Notify when latest sleep score is updated", required: false, defaultValue: false
+      }
     }
+  }
 }
 
 def headerSECTION() {
-	return paragraph (image: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png",
-                  "${textVersion()}")
+  return paragraph (image: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png", "${textVersion()}")
+}
+
+def isNotNullOrEmptyString(value) {
+  return isNullOrEmptyString(value) == false
 }
 
 def stateTokenPresent() {
-	return state.eightSleepAccessToken != null && state.eightSleepAccessToken != ''
+  return isNotNullOrEmptyString(state.eightSleepAccessToken)
 }
 
 def statePartnerTokenPresent() {
-	return state.eightSleepPartnerAccessToken != null && state.eightSleepPartnerAccessToken != ''
+  return isNotNullOrEmptyString(state.eightSleepPartnerAccessToken)
 }
 
 def authenticated() {
-	return (state.eightSleepAccessToken != null && state.eightSleepAccessToken != '') ? "complete" : null
+  return (state.eightSleepAccessToken != null && state.eightSleepAccessToken != '') ? "complete" : null
 }
 
 def partnerAuthenticated() {
-	return (state.eightSleepPartnerAccessToken != null && state.eightSleepPartnerAccessToken != '') ? "complete" : null
+  return (state.eightSleepPartnerAccessToken != null && state.eightSleepPartnerAccessToken != '') ? "complete" : null
 }
 
 def devicesSelected() {
-	return (selectedEightSleep) ? "complete" : null
+  return (selectedEightSleep) ? "complete" : null
 }
 
 def getDevicesSelectedString() {
-	if (state.eightSleepDevices == null) {
-    	updateDevices()
-  	}
+  if (state.eightSleepDevices == null) {
+    updateDevices()
+  }
 
-	def listString = ""
-	selectedEightSleep.each { childDevice ->
-    	if (state.eightSleepDevices[childDevice] != null) listString += state.eightSleepDevices[childDevice] + "\n"
-  	}
-  	return listString
+  def listString = ""
+  selectedEightSleep.each { childDevice ->
+    if (state.eightSleepDevices[childDevice] != null) listString += state.eightSleepDevices[childDevice] + "\n"
+  }
+  return listString
 }
 
 def notificationsSelected() {
-    return ((location.contactBookEnabled && settings.recipients) || settings.sendPush || settings.sendSMS != null) && (settings.onNotification || settings.offNotification || settings.inBedNotification || settings.outOfBedNotification || settings.heatLevelReachedNotification || settings.sleepScoreNotification) ? "complete" : null
+  return ((location.contactBookEnabled && settings.recipients) || settings.sendPush || settings.sendSMS != null) && (settings.onNotification || settings.offNotification || settings.inBedNotification || settings.outOfBedNotification || settings.heatLevelReachedNotification || settings.sleepScoreNotification) ? "complete" : null
 }
 
 def getNotificationsString() {
-	def listString = ""
-    if (location.contactBookEnabled && settings.recipients) {
-    	listString += "Send the following notifications to " + settings.recipients
-    }
-    else if (settings.sendPush) {
-    	listString += "Send the following notifications"
-    }
+  def listString = ""
+  if (location.contactBookEnabled && settings.recipients) {
+    listString += "Send the following notifications to " + settings.recipients
+  }
+  else if (settings.sendPush) {
+    listString += "Send the following notifications"
+  }
 
-    if (!settings.recipients && !settings.sendPush && settings.sendSMS != null) {
-    	listString += "Send the following SMS to ${settings.sendSMS}"
-    }
-    else if (settings.sendSMS != null) {
-    	listString += " and SMS to ${settings.sendSMS}"
-    }
+  if (!settings.recipients && !settings.sendPush && settings.sendSMS != null) {
+    listString += "Send the following SMS to ${settings.sendSMS}"
+  }
+  else if (settings.sendSMS != null) {
+    listString += " and SMS to ${settings.sendSMS}"
+  }
 
-    if ((location.contactBookEnabled && settings.recipients) || settings.sendPush || settings.sendSMS != null) {
-    	listString += ":\n"
-        if (settings.onNotification) listString += "• Eight Sleep On\n"
-        if (settings.offNotification) listString += "• Eight Sleep Off\n"
-  		if (settings.inBedNotification) listString += "• In Bed\n"
-  		if (settings.outOfBedNotification) listString += "• Out Of Bed\n"
-  		if (settings.heatLevelReachedNotification) listString += "• Desired Heat Level Reached\n"
-  		if (settings.sleepScoreNotification) listString += "• Sleep Score\n"
-    }
-    if (listString != "") listString = listString.substring(0, listString.length() - 1)
-    return listString
+  if ((location.contactBookEnabled && settings.recipients) || settings.sendPush || settings.sendSMS != null) {
+    listString += ":\n"
+    if (settings.onNotification) listString += "• Eight Sleep On\n"
+    if (settings.offNotification) listString += "• Eight Sleep Off\n"
+    if (settings.inBedNotification) listString += "• In Bed\n"
+    if (settings.outOfBedNotification) listString += "• Out Of Bed\n"
+    if (settings.heatLevelReachedNotification) listString += "• Desired Heat Level Reached\n"
+    if (settings.sleepScoreNotification) listString += "• Sleep Score\n"
+  }
+  if (listString != "") listString = listString.substring(0, listString.length() - 1)
+
+  return listString
 }
 
 // App lifecycle hooks
 
 def installed() {
-	log.debug "installed"
-	initialize()
-	// Check for new devices and remove old ones every 3 hours
-	runEvery3Hours('updateDevices')
-    // execute refresh method every minute
-    runEvery5Minutes('refreshDevices')
+  log.debug "installed"
+  initialize()
+  // Check for new devices and remove old ones every 3 hours
+  runEvery3Hours('updateDevices')
+  // execute refresh method every minute
+  runEvery5Minutes('refreshDevices')
 }
 
 // called after settings are changed
 def updated() {
-	log.debug "updated"
-	initialize()
-    unschedule('refreshDevices')
-    runEvery5Minutes('refreshDevices')
+  log.debug "updated"
+  initialize()
+  unschedule('refreshDevices')
+  runEvery5Minutes('refreshDevices')
 }
 
 def uninstalled() {
-	log.info("Uninstalling, removing child devices...")
-	unschedule()
-	removeChildDevices(getChildDevices())
+  log.info("Uninstalling, removing child devices...")
+  unschedule()
+  removeChildDevices(getChildDevices())
 }
 
 private removeChildDevices(devices) {
-	devices.each {
-		deleteChildDevice(it.deviceNetworkId) // 'it' is default
-	}
+  devices.each {
+    deleteChildDevice(it.deviceNetworkId) // 'it' is default
+  }
 }
 
 // Implement event handlers
 def eventHandler(evt) {
-	log.debug "Executing 'eventHandler' for ${evt.displayName}"
-	def msg
+  log.debug "Executing 'eventHandler' for ${evt.displayName}"
+  def msg
     if (evt.value == "open") {
-    	msg = "${evt.displayName} is out of bed."
-		if (settings.outOfBedNotification) {
-			messageHandler(msg, false)
-		}
+      msg = "${evt.displayName} is out of bed."
+    if (settings.outOfBedNotification) {
+      messageHandler(msg, false)
     }
-	else if (evt.value == "closed") {
-    	msg = "${evt.displayName} is in bed."
-		if (settings.inBedNotification) {
-			messageHandler(msg, false)
-		}
+  }
+  else if (evt.value == "closed") {
+    msg = "${evt.displayName} is in bed."
+    if (settings.inBedNotification) {
+      messageHandler(msg, false)
     }
-	else if (evt.value == "on") {
-     	msg = "${evt.displayName} is on."
-		if (settings.onNotification) {
-			messageHandler(msg, false)
-		}
+  }
+  else if (evt.value == "on") {
+    msg = "${evt.displayName} is on."
+    if (settings.onNotification) {
+      messageHandler(msg, false)
     }
-	else if (evt.value == "off") {
-     	msg = "${evt.displayName} is off."
-		if (settings.offNotification) {
-			messageHandler(msg, false)
-		}
-	}
-    else if (evt.value == "true") {
-     	msg = "${evt.displayName} has reached desired temperature."
-		if (settings.heatLevelReachedNotification) {
-			messageHandler(msg, false)
-		}
-	}
-    else if (evt.name == "battery") {
-     	msg = "${evt.displayName} sleep score is ${evt.value}."
-		if (settings.sleepScoreNotification) {
-			messageHandler(msg, false)
-		}
+  }
+  else if (evt.value == "off") {
+    msg = "${evt.displayName} is off."
+    if (settings.offNotification) {
+      messageHandler(msg, false)
     }
+  }
+  else if (evt.value == "true") {
+    msg = "${evt.displayName} has reached desired temperature."
+    if (settings.heatLevelReachedNotification) {
+      messageHandler(msg, false)
+    }
+  }
+  else if (evt.name == "battery") {
+    msg = "${evt.displayName} sleep score is ${evt.value}."
+    if (settings.sleepScoreNotification) {
+      messageHandler(msg, false)
+    }
+  }
 }
 
 // called after Done is hit after selecting a Location
 def initialize() {
-	log.debug "initialize"
-	if (selectedEightSleep) {
-		addEightSleep()
-	}
+  log.debug "initialize"
+  if (selectedEightSleep) {
+    addEightSleep()
+  }
 
-    def devices = getChildDevices()
-	devices.each {
-   		if (notificationsSelected() == "complete") {
-        	subscribe(it, "switch", eventHandler, [filterEvents: false])
-        	subscribe(it, "contact", eventHandler, [filterEvents: false])
-            subscribe(it, "desiredHeatLevelReached", eventHandler, [filterEvents: false])
-            subscribe(it, "battery", eventHandler, [filterEvents: false])
-        }
-    	log.debug "Refreshing device $it.name"
-        it.refresh()
-	}
+  def devices = getChildDevices()
+  devices.each {
+    if (notificationsSelected() == "complete") {
+      subscribe(it, "switch", eventHandler, [filterEvents: false])
+      subscribe(it, "contact", eventHandler, [filterEvents: false])
+      subscribe(it, "desiredHeatLevelReached", eventHandler, [filterEvents: false])
+      subscribe(it, "battery", eventHandler, [filterEvents: false])
+    }
+    log.debug "Refreshing device $it.name"
+    it.refresh()
+  }
 }
 
 def updateDevices() {
-	if (!state.devices) {
-		state.devices = [:]
-	}
-	def devices = devicesList()
-  	state.eightSleepDevices = [:]
+  if (!state.devices) {
+    state.devices = [:]
+  }
+  def devices = devicesList()
+  state.eightSleepDevices = [:]
 
-    def selectors = []
+  def selectors = []
 
-	devices.each { device ->
-        log.debug "Identified: device ${device}"
-        def value = "Eight Sleep ${device.reverse().take(4).reverse()}"
-		def key = device
-		state.eightSleepDevices["${key}"] = value
-        def resp = apiGET("/devices/${device}?filter=ownerId,leftUserId,rightUserId")
-        if (resp.status == 200) {
-        	def leftUserId = resp.data.result.leftUserId
-        	def rightUserId = resp.data.result.rightUserId
-        	selectors.add("${device}/${leftUserId}")
-        	selectors.add("${device}/${rightUserId}")
-		} else {
-			log.error("Non-200 from device list call. ${resp.status} ${resp.data}")
-			return []
-		}
+  devices.each { device ->
+    log.debug "Identified: device ${device}"
+    def value = "Eight Sleep ${device.reverse().take(4).reverse()}"
+    def key = device
+    state.eightSleepDevices["${key}"] = value
+    def resp = apiGET("/devices/${device}?filter=ownerId,leftUserId,rightUserId")
+
+    if (resp.status == 200) {
+      def leftUserId = resp.data.result.leftUserId
+      def rightUserId = resp.data.result.rightUserId
+      selectors.add("${device}/${leftUserId}")
+      selectors.add("${device}/${rightUserId}")
+    } else {
+      log.error("Non-200 from device list call. ${resp.status} ${resp.data}")
+      return []
     }
-   	log.debug selectors
+  }
+  log.debug selectors
 
-    //Remove devices if does not exist on the Eight Sleep platform
-    getChildDevices().findAll { !selectors.contains("${it.deviceNetworkId}") }.each {
-		log.info("Deleting ${it.deviceNetworkId}")
-        try {
-			deleteChildDevice(it.deviceNetworkId)
-        } catch (physicalgraph.exception.NotFoundException e) {
-        	log.info("Could not find ${it.deviceNetworkId}. Assuming manually deleted.")
-        } catch (physicalgraph.exception.ConflictException ce) {
-        	log.info("Device ${it.deviceNetworkId} in use. Please manually delete.")
-        }
-	}
+  //Remove devices if does not exist on the Eight Sleep platform
+  getChildDevices().findAll { !selectors.contains("${it.deviceNetworkId}") }.each {
+    log.info("Deleting ${it.deviceNetworkId}")
+    try {
+      deleteChildDevice(it.deviceNetworkId)
+    } catch (physicalgraph.exception.NotFoundException e) {
+      log.info("Could not find ${it.deviceNetworkId}. Assuming manually deleted.")
+    } catch (physicalgraph.exception.ConflictException ce) {
+      log.info("Device ${it.deviceNetworkId} in use. Please manually delete.")
+    }
+  }
 }
 
 def addEightSleep() {
-	updateDevices()
+  updateDevices()
 
-	selectedEightSleep.each { device ->
-    	def resp = apiGET("/devices/${device}?filter=ownerId,leftUserId,rightUserId")
-        if (resp.status == 200) {
-        	//Add left side of mattress as device
-            def ownerId = resp.data.result.ownerId
-        	def leftUserId = resp.data.result.leftUserId
-            def rightUserId = resp.data.result.rightUserId
-            def childDevice
-            if ((leftUserId == ownerId) || (partnerAuthenticated())) {
-            	childDevice = getChildDevice("${device}/${leftUserId}")
-        		if (!childDevice && state.eightSleepDevices[device] != null) {
-    				log.info("Adding device ${device}/${leftUserId}: ${state.eightSleepDevices[device]} [Left]")
-					def data = [
-            			name: "${state.eightSleepDevices[device]} [Left]",
-						label: "${state.eightSleepDevices[device]} [Left]"
-					]
-            		childDevice = addChildDevice(app.namespace, "Eight Sleep Mattress", "${device}/${leftUserId}", null, data)
-					log.debug "Created ${state.eightSleepDevices[device]} [Left] with id: ${device}/${leftUserId}"
-				} else {
-					log.debug "found ${state.eightSleepDevices[device]} [Left] with id ${device}/${leftUserId} already exists"
-				}
-        	}
+  selectedEightSleep.each { device ->
+    def resp = apiGET("/devices/${device}?filter=ownerId,leftUserId,rightUserId")
+    if (resp.status == 200) {
+      //Add left side of mattress as device
+      def ownerId = resp.data.result.ownerId
+      def leftUserId = resp.data.result.leftUserId
+      def rightUserId = resp.data.result.rightUserId
+      def childDevice
+      if ((leftUserId == ownerId) || (partnerAuthenticated())) {
+        childDevice = getChildDevice("${device}/${leftUserId}")
+        if (!childDevice && state.eightSleepDevices[device] != null) {
+          log.info("Adding device ${device}/${leftUserId}: ${state.eightSleepDevices[device]} [Left]")
+          def data = [
+            name: "${state.eightSleepDevices[device]} [Left]",
+            label: "${state.eightSleepDevices[device]} [Left]"
+          ]
+          childDevice = addChildDevice(app.namespace, "Eight Sleep Mattress", "${device}/${leftUserId}", null, data)
+          log.debug "Created ${state.eightSleepDevices[device]} [Left] with id: ${device}/${leftUserId}"
+        } else {
+          log.debug "found ${state.eightSleepDevices[device]} [Left] with id ${device}/${leftUserId} already exists"
+        }
+      }
 
-            //Add right side of mattress as device
-        	if ((rightUserId == ownerId) || (partnerAuthenticated())) {
-            	childDevice = getChildDevice("${device}/${rightUserId}")
-        		if (!childDevice && state.eightSleepDevices[device] != null) {
-    				log.info("Adding device ${device}/${rightUserId}: ${state.eightSleepDevices[device]} [Right]")
-					def data = [
-            			name: "${state.eightSleepDevices[device]} [Right]",
-						label: "${state.eightSleepDevices[device]} [Right]"
-					]
-            		childDevice = addChildDevice(app.namespace, "Eight Sleep Mattress", "${device}/${rightUserId}", null, data)
-					log.debug "Created ${state.eightSleepDevices[device]} [Right] with id: ${device}/${rightUserId}"
-				} else {
-					log.debug "found ${state.eightSleepDevices[device]} [Right] with id ${device}/${rightUserId} already exists"
-				}
-            }
-		} else {
-			log.error("Non-200 from device list call. ${resp.status} ${resp.data}")
-			return []
-		}
-	}
+        //Add right side of mattress as device
+      if ((rightUserId == ownerId) || (partnerAuthenticated())) {
+        childDevice = getChildDevice("${device}/${rightUserId}")
+        if (!childDevice && state.eightSleepDevices[device] != null) {
+          log.info("Adding device ${device}/${rightUserId}: ${state.eightSleepDevices[device]} [Right]")
+          def data = [
+            name: "${state.eightSleepDevices[device]} [Right]",
+            label: "${state.eightSleepDevices[device]} [Right]"
+           ]
+          childDevice = addChildDevice(app.namespace, "Eight Sleep Mattress", "${device}/${rightUserId}", null, data)
+          log.debug "Created ${state.eightSleepDevices[device]} [Right] with id: ${device}/${rightUserId}"
+        } else {
+          log.debug "found ${state.eightSleepDevices[device]} [Right] with id ${device}/${rightUserId} already exists"
+        }
+      }
+    } else {
+      log.error("Non-200 from device list call. ${resp.status} ${resp.data}")
+      return []
+    }
+  }
 }
 
 def refreshDevices() {
-	log.info("Executing refreshDevices...")
-    atomicState.renewAttempt = 0
-    atomicState.renewAttemptPartner = 0
-	getChildDevices().each { device ->
-    	log.info("Refreshing device ${device.name} ...")
-    	device.refresh()
-    }
+  log.info("Executing refreshDevices...")
+  atomicState.renewAttempt = 0
+  atomicState.renewAttemptPartner = 0
+  getChildDevices().each { device ->
+    log.info("Refreshing device ${device.name} ...")
+    device.refresh()
+  }
 }
 
 def devicesList() {
-	logErrors([]) {
-    	def resp = apiGET("/users/me")
-		if (resp.status == 200) {
-			return resp.data.user.devices
-		} else {
-			log.error("Non-200 from device list call. ${resp.status} ${resp.data}")
-			return []
-		}
-	}
+  logErrors([]) {
+    def resp = apiGET("/users/me")
+    if (resp.status == 200) {
+      return resp.data.user.devices
+    } else {
+      log.error("Non-200 from device list call. ${resp.status} ${resp.data}")
+      return []
+   }
+  }
 }
 
 def getEightSleepAccessToken() {
@@ -658,9 +676,9 @@ def messageHandler(msg, forceFlag) {
 }
 
 private def textVersion() {
-    def text = "Eight Sleep (Connect)\nVersion: 1.0.1\nDate: 21102018(2018)"
+  def text = "Eight Sleep (Connect)\nVersion: 1.0.1\nDate: 21102018(2018)"
 }
 
 private def textCopyright() {
-    def text = "Copyright © 2018 Jason Franz"
+  def text = "Copyright © 2018 Jason Franz"
 }

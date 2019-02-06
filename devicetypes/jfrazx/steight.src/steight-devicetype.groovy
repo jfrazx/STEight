@@ -2,7 +2,7 @@
  *  Eight Sleep Mattress
  *
  *  Copyright 2017 Alex Lee Yuk Cheung
- *  Copyright 2018 Jason Franz
+ *  Copyright 2019 Jason Franz
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -54,7 +54,7 @@ preferences {
 }
 
 metadata {
-  definition (name: "Eight Sleep Mattress", namespace: "jfrazx", author: "Jason Franz") {
+  definition (name: "STEight Mattress", namespace: "jfrazx", author: "Jason Franz") {
     capability "Actuator"
     capability "Contact Sensor"
     capability "Polling"
