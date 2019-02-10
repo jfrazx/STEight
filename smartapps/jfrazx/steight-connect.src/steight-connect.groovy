@@ -14,6 +14,7 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  *	VERSION HISTORY
+ *  05.02.2019: v1.0.2 - Name change, helper functions
  *  21.10.2018: v1.0.1 - Forked
  *	26.01.2017: v1.0b - Token renew error fix.
  *	26.01.2017: v1.0 - Remove BETA label.
@@ -52,7 +53,7 @@ def firstPage() {
     return dynamicPage(name: "firstPage", title: "", install: true, uninstall: true) {
       section {
         headerSECTION()
-        href("loginPAGE", title: null, description: authenticated() ? "Authenticated as " +username : "Tap to enter Eight Sleep account crednentials", state: authenticated())
+        href("loginPAGE", title: null, description: authenticated() ? "Authenticated as " +username : "Tap to enter Eight Sleep account credentials", state: authenticated())
       }
     }
   }
@@ -61,11 +62,11 @@ def firstPage() {
     return dynamicPage(name: "firstPage", title: "", install: true, uninstall: true) {
       section {
         headerSECTION()
-        href("loginPAGE", title: null, description: authenticated() ? "Authenticated as " +username : "Tap to enter Eight Sleep account crednentials", state: authenticated())
+        href("loginPAGE", title: null, description: authenticated() ? "Authenticated as " +username : "Tap to enter Eight Sleep account credentials", state: authenticated())
       }
       if (stateTokenPresent()) {
         section ("Add your partner's credentials (optional):") {
-          href("partnerLoginPAGE", title: null, description: partnerAuthenticated() ? "Authenticated as " + partnerUsername : "Tap to enter Eight Sleep partner account crednentials", state: partnerAuthenticated())
+          href("partnerLoginPAGE", title: null, description: partnerAuthenticated() ? "Authenticated as " + partnerUsername : "Tap to enter Eight Sleep partner account credentials", state: partnerAuthenticated())
         }
         section ("Choose your Eight Sleep devices:") {
           href("selectDevicePAGE", title: null, description: devicesSelected() ? getDevicesSelectedString() : "Tap to select Eight Sleep devices", state: devicesSelected())
@@ -73,8 +74,8 @@ def firstPage() {
         section ("Notifications:") {
           href("notificationsPAGE", title: null, description: notificationsSelected() ? getNotificationsString() : "Tap to configure notifications", state: notificationsSelected())
         }
-        section () {
-          label name: "name", title: "Assign a Name", required: true, state: (name ? "complete" : null), defaultValue: app.name
+        section ("App Name") {
+          label name: "name", title: "Assign a Name", defaultValue: app.name
         }
       } else {
         section {
@@ -423,7 +424,7 @@ def addEightSleep() {
             name: "${state.eightSleepDevices[device]} [Left]",
             label: "${state.eightSleepDevices[device]} [Left]"
           ]
-          childDevice = addChildDevice(app.namespace, "Eight Sleep Mattress", "${device}/${leftUserId}", null, data)
+          childDevice = addChildDevice(app.namespace, "STEight Mattress", "${device}/${leftUserId}", null, data)
           log.debug "Created ${state.eightSleepDevices[device]} [Left] with id: ${device}/${leftUserId}"
         } else {
           log.debug "found ${state.eightSleepDevices[device]} [Left] with id ${device}/${leftUserId} already exists"
@@ -439,7 +440,7 @@ def addEightSleep() {
             name: "${state.eightSleepDevices[device]} [Right]",
             label: "${state.eightSleepDevices[device]} [Right]"
            ]
-          childDevice = addChildDevice(app.namespace, "Eight Sleep Mattress", "${device}/${rightUserId}", null, data)
+          childDevice = addChildDevice(app.namespace, "STEight Mattress", "${device}/${rightUserId}", null, data)
           log.debug "Created ${state.eightSleepDevices[device]} [Right] with id: ${device}/${rightUserId}"
         } else {
           log.debug "found ${state.eightSleepDevices[device]} [Right] with id ${device}/${rightUserId} already exists"
