@@ -32,10 +32,11 @@ definition(
   name: "STEight (Connect)",
   namespace: "jfrazx",
   author: "Jason Franz",
+  category: 'Health & Wellness',
   description: "Connect your Eight Sleep device to SmartThings",
-  iconUrl: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png",
-  iconX2Url: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png",
-  iconX3Url: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png"
+  iconUrl: "https://raw.githubusercontent.com/jfrazx/STEight/master/assets/8slp-icon.png",
+  iconX2Url: "https://raw.githubusercontent.com/jfrazx/STEight/master/assets/8slp-icon.png",
+  iconX3Url: "https://raw.githubusercontent.com/jfrazx/STEight/master/assets/8slp-icon.png"
 )
 
 preferences {
@@ -173,7 +174,7 @@ def selectDevicePAGE() {
   dynamicPage(name: "selectDevicePAGE", title: "Devices", uninstall: false, install: false) {
     section { headerSECTION() }
     section("Select your devices:") {
-      input "selectedEightSleep", "enum", image: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/eightsleep-device.png", required:false, title:"Select Eight Sleep Device \n(${state.eightSleepDevices.size() ?: 0} found)", multiple:true, options:state.eightSleepDevices
+      input "selectedEightSleep", "enum", image: "https://raw.githubusercontent.com/jfrazx/STEight/master/assets/eightsleep-device.png", required:false, title:"Select Eight Sleep Device \n(${state.eightSleepDevices.size() ?: 0} found)", multiple:true, options:state.eightSleepDevices
     }
   }
 }
@@ -198,7 +199,7 @@ def notificationsPAGE() {
 }
 
 def headerSECTION() {
-  return paragraph (image: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png", "${textVersion()}")
+  return paragraph (image: "https://raw.githubusercontent.com/jfrazx/STEight/master/assets/8slp-icon.png", "${textVersion()}")
 }
 
 def isNotNullOrEmptyString(value) {
@@ -306,8 +307,8 @@ private removeChildDevices(devices) {
 def eventHandler(evt) {
   log.debug "Executing 'eventHandler' for ${evt.displayName}"
   def msg
-    if (evt.value == "open") {
-      msg = "${evt.displayName} is out of bed."
+  if (evt.value == "open") {
+    msg = "${evt.displayName} is out of bed."
     if (settings.outOfBedNotification) {
       messageHandler(msg, false)
     }
