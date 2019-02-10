@@ -14,7 +14,8 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  *	VERSION HISTORY
- *  21.10.2018: 1.1.1 Forked
+ *  11.02.2019: 1.1.2 - Updated Device Type Name
+ *  21.10.2018: 1.1.1 - Forked
  *	13.11.2017: 1.1 - Add back up method for determining sleep event if presence values from API become unreliable.
  *	26.01.2017: 1.0 - Remove BETA label.
  *
@@ -631,7 +632,7 @@ def poll() {
           hData = """
               <div class="centerText" style="font-family: helvetica, arial, sans-serif;">
           <p>Sleep data unavailable for partner user.</p>
-          <p>Open the Eight Sleep (Connect) app to enter partner side credentials.</p>
+          <p>Open the STEight (Connect) app to enter partner side credentials.</p>
         </div>
             """
         }
@@ -783,9 +784,9 @@ def poll() {
 def cssUrl()	 { return "https://raw.githubusercontent.com/desertblade/ST-HTMLTile-Framework/master/css/smartthings.css" }
 
 private def textVersion() {
-  def text = "Eight Sleep Mattress\nVersion: 1.1.1\nDate: 21102018(1021)"
+  def text = "STEight Mattress\nVersion: 1.1.2\nDate: 11022019(1102)"
 }
 
 private def textCopyright() {
-  def text = "Copyright © 2018 Jason Franz"
+  def text = "Copyright © 2019 Jason Franz"
 }

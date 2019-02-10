@@ -14,6 +14,7 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  *	VERSION HISTORY
+ *  11.02.2019: v1.0.3 - Device type reference, remove category
  *  05.02.2019: v1.0.2 - Name change, helper functions
  *  21.10.2018: v1.0.1 - Forked
  *	26.01.2017: v1.0b - Token renew error fix.
@@ -32,7 +33,6 @@ definition(
   namespace: "jfrazx",
   author: "Jason Franz",
   description: "Connect your Eight Sleep device to SmartThings",
-  category: "Health & Fitness",
   iconUrl: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png",
   iconX2Url: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png",
   iconX3Url: "https://raw.githubusercontent.com/alyc100/SmartThingsPublic/master/smartapps/alyc100/8slp-icon.png"
@@ -677,9 +677,9 @@ def messageHandler(msg, forceFlag) {
 }
 
 private def textVersion() {
-  def text = "Eight Sleep (Connect)\nVersion: 1.0.1\nDate: 21102018(2018)"
+  def text = "STEight (Connect)\nVersion: 1.0.3\nDate: 11022019(2019)"
 }
 
 private def textCopyright() {
-  def text = "Copyright © 2018 Jason Franz"
+  def text = "Copyright © 2019 Jason Franz"
 }
